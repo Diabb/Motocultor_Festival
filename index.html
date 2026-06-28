@@ -391,64 +391,6 @@
       color: var(--muted);
       margin-bottom: .75rem;
     }
-    /* ── FICHE ENRICHIE ── */
-    .sheet-hero {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--card);
-      overflow: hidden;
-      border-radius: 0;
-      margin-bottom: .75rem;
-    }
-    .sheet-hero img {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity .4s ease;
-    }
-    .sheet-hero img.loaded { opacity: 1; }
-    .sheet-hero-skeleton {
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, var(--card) 25%, var(--surface) 50%, var(--card) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3.5rem; color: rgba(255,255,255,.05);
-    }
-    @keyframes shimmer { to { background-position: -200% 0; } }
-    .sheet-socials {
-      display: flex; gap: .45rem; flex-wrap: wrap;
-      padding: 0 1rem .75rem;
-    }
-    .social-btn {
-      display: inline-flex; align-items: center; gap: .3rem;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 20px; color: var(--muted);
-      font-size: .72rem; font-weight: 600; font-family: var(--font-display);
-      letter-spacing: .04em; text-transform: uppercase;
-      padding: .3rem .65rem; text-decoration: none;
-      transition: border-color .2s, color .2s;
-      white-space: nowrap;
-    }
-    .social-btn:hover { border-color: var(--teal); color: var(--teal); }
-    .social-btn.fb    { --sc: #1877f2; }
-    .social-btn.ig    { --sc: #e1306c; }
-    .social-btn.yt    { --sc: #ff0000; }
-    .social-btn.sp    { --sc: #1db954; }
-    .social-btn.tw    { --sc: #1da1f2; }
-    .social-btn:hover { border-color: var(--sc, var(--teal)); color: var(--sc, var(--teal)); }
-    .sheet-official {
-      margin: 0 1rem .75rem;
-      display: flex; align-items: center; justify-content: center; gap: .4rem;
-      padding: .45rem; border-radius: 8px;
-      background: rgba(26,158,143,.08); border: 1px solid rgba(26,158,143,.3);
-      color: var(--teal); font-size: .75rem; font-weight: 600;
-      font-family: var(--font-display); letter-spacing: .05em; text-transform: uppercase;
-      text-decoration: none; transition: background .2s;
-    }
-    .sheet-official:hover { background: rgba(26,158,143,.18); }
     .sheet-actions {
       display: flex;
       gap: .75rem;
@@ -946,183 +888,26 @@ function refreshAll() {
 }
 
 // ── DETAIL SHEET ──
-// ── Cache session des données enrichies ──────────────────────
-const _artistCache = {};
-
-// Proxy CORS public — contourne le 403 du site Motocultor
-function proxyUrl(url) {
-  return 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-}
-
-function parseArtistPage(html, set) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  // Image : og:image
-  let image = null;
-  const ogImg = doc.querySelector('meta[property="og:image"]');
-  if (ogImg) image = ogImg.getAttribute('content');
-
-  // Pays + Genre : balise h2 contenant " // " ex: "USA // METAL ALTERNATIF"
-  let country = null;
-  let genre = null;
-  const COUNTRY_FLAGS = {
-    'USA':'🇺🇸','FRANCE':'🇫🇷','UK':'🇬🇧','ALLEMAGNE':'🇩🇪','SUÈDE':'🇸🇪',
-    'NORVÈGE':'🇳🇴','FINLANDE':'🇫🇮','BELGIQUE':'🇧🇪','PAYS-BAS':'🇳🇱',
-    'CANADA':'🇨🇦','AUSTRALIE':'🇦🇺','POLOGNE':'🇵🇱','SUISSE':'🇨🇭',
-    'PORTUGAL':'🇵🇹','DANEMARK':'🇩🇰','ITALIE':'🇮🇹','ESPAGNE':'🇪🇸',
-    'RUSSIE':'🇷🇺','AUTRICHE':'🇦🇹','TUNISIE':'🇹🇳','IRLANDE':'🇮🇪',
-    'GRÈCE':'🇬🇷','BRÉSIL':'🇧🇷',
-  };
-  doc.querySelectorAll('h2').forEach(h => {
-    const t = h.textContent.trim();
-    if (t.includes('//')) {
-      const parts = t.split('//').map(s => s.trim());
-      if (parts.length >= 2) {
-        const rawCountry = parts[0].toUpperCase();
-        const flag = COUNTRY_FLAGS[rawCountry] || '🌍';
-        country = flag + ' ' + parts[0];
-        genre = parts.slice(1).join(' / ').toLowerCase()
-          .replace(/\w/g, c => c.toUpperCase());
-      }
-    }
-  });
-
-  // Description : premier paragraphe long du contenu artiste
-  let desc = null;
-  const paras = doc.querySelectorAll('p');
-  for (const p of paras) {
-    const t = p.textContent.trim();
-    if (t.length > 100 &&
-        !t.includes('AOÛT 2026') &&
-        !t.includes('Carhaix') &&
-        !t.includes('Cookie') &&
-        !t.includes('Motocultor Fest Prod')) {
-      desc = t.slice(0, 600);
-      break;
-    }
-  }
-
-  // Réseaux sociaux
-  const socials = [];
-  const seen = new Set();
-  const EXCLUDE = ['motocultor-festival.com','facebook.com/MOTOCULTOR','instagram.com/motocultorfestival',
-    'twitter.com/MotocultorFest','youtube.com/user/MotocultorFestProd','linkedin.com/company/motocultor',
-    'ontours.fr','weezevent.com','seetickets.com','re-animator','googletagmanager'];
-  const SOCIAL_MAP = [
-    ['facebook.com/',    'Facebook',  'fb'],
-    ['instagram.com/',   'Instagram', 'ig'],
-    ['youtube.com/',     'YouTube',   'yt'],
-    ['open.spotify.com', 'Spotify',   'sp'],
-    ['twitter.com/',     'Twitter/X', 'tw'],
-    ['bandcamp.com',     'Bandcamp',  'bc'],
-    ['tiktok.com/',      'TikTok',    'tt'],
-  ];
-  doc.querySelectorAll('a[href]').forEach(a => {
-    const href = a.href || '';
-    if (!href.startsWith('http')) return;
-    if (EXCLUDE.some(e => href.includes(e))) return;
-    if (seen.has(href)) return;
-    for (const [pattern, label, cls] of SOCIAL_MAP) {
-      if (href.includes(pattern)) {
-        socials.push({url: href, label, cls});
-        seen.add(href);
-        break;
-      }
-    }
-  });
-
-  return { image, desc, country, genre, socials };
-}
-
-async function enrichArtist(set) {
-  if (_artistCache[set.name]) return _artistCache[set.name];
-  const slug = (typeof ARTIST_SLUGS !== 'undefined') ? ARTIST_SLUGS[set.name] : null;
-  if (!slug) return null;
-  const artistUrl = 'https://www.motocultor-festival.com/artiste/' + slug + '/';
-  try {
-    const res = await fetch(proxyUrl(artistUrl), { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const html = json.contents;
-    if (!html) return null;
-    const data = { ...parseArtistPage(html, set), url: artistUrl };
-    _artistCache[set.name] = data;
-    return data;
-  } catch { return null; }
-}
-
-function buildSheetBody(set, enriched) {
-  const img = enriched?.image;
-  const desc = enriched?.desc || set.desc;
-  const socials = enriched?.socials || [];
-  const artistUrl = enriched?.url || null;
-  const stageColor = STAGES[set.stage]?.color || '#1a9e8f';
-  const sc = stageClass(set.stage);
-
-  // Header (toujours immédiat)
-  document.getElementById('sheet-header').innerHTML =
-    '<div class="sheet-stage-row">' +
-      '<span class="stage-dot ' + sc + '" style="width:9px;height:9px"></span>' +
-      '<span class="sheet-stage-name" style="color:' + stageColor + '">' + set.stage + '</span>' +
-      '<span class="sheet-time-badge">' + set.time + ' – ' + set.end + '</span>' +
-    '</div>' +
-    '<div class="sheet-title">' + set.name + '</div>' +
-    '<div class="sheet-genre">' + (enriched?.genre || set.genre) + '</div>';
-
-  // Hero image
-  let heroHTML;
-  if (img) {
-    heroHTML = '<div class="sheet-hero">' +
-      '<div class="sheet-hero-skeleton">🎸</div>' +
-      '<img src="' + img + '" alt="' + set.name + '" onload="this.classList.add('loaded')" onerror="this.style.display='none'">' +
-      '</div>';
-  } else if (!enriched) {
-    // Pas encore chargé : skeleton discret
-    heroHTML = '<div class="sheet-hero"><div class="sheet-hero-skeleton">🎸</div></div>';
-  } else {
-    heroHTML = ''; // Pas d'image après chargement
-  }
-
-  // Socials
-  const socialsHTML = socials.length
-    ? '<div class="sheet-socials">' + socials.map(s =>
-        '<a class="social-btn ' + s.cls + '" href="' + s.url + '" target="_blank" rel="noopener">' + s.label + '</a>'
-      ).join('') + '</div>'
-    : '';
-
-  // Lien officiel
-  const officialHTML = artistUrl
-    ? '<a class="sheet-official" href="' + artistUrl + '" target="_blank" rel="noopener">🌐 Fiche Motocultor</a>'
-    : '';
-
-  document.getElementById('sheet-body').innerHTML =
-    heroHTML +
-    '<div style="padding:0 1rem">' +
-      '<div class="sheet-country">' + (enriched?.country || set.country) + '</div>' +
-      '<div class="sheet-desc">' + desc + '</div>' +
-    '</div>' +
-    socialsHTML +
-    officialHTML;
-}
-
 function openSheet(id) {
   const set = findSet(id);
   if (!set) return;
   activeSetId = id;
-
-  // 1. Affichage immédiat avec données locales
-  buildSheetBody(set, _artistCache[set.name] || null);
+  const stageColor = STAGES[set.stage]?.color || '#1a9e8f';
+  const sc = stageClass(set.stage);
+  document.getElementById('sheet-header').innerHTML = `
+    <div class="sheet-stage-row">
+      <span class="stage-dot ${sc}" style="width:9px;height:9px"></span>
+      <span class="sheet-stage-name" style="color:${stageColor}">${set.stage}</span>
+      <span class="sheet-time-badge">${set.time} – ${set.end}</span>
+    </div>
+    <div class="sheet-title">${set.name}</div>
+    <div class="sheet-genre">${set.genre}</div>`;
+  document.getElementById('sheet-body').innerHTML = `
+    <div class="sheet-country">${set.country}</div>
+    <div class="sheet-desc">${set.desc}</div>`;
   updateSheetBtn();
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('detail-sheet').classList.add('open');
-
-  // 2. Enrichissement asynchrone si pas en cache et online
-  if (!_artistCache[set.name] && navigator.onLine) {
-    enrichArtist(set).then(data => {
-      if (data && activeSetId === id) buildSheetBody(set, data);
-    });
-  }
 }
 function updateSheetBtn() {
   if (!activeSetId) return;
