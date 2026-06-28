@@ -391,6 +391,32 @@
       color: var(--muted);
       margin-bottom: .75rem;
     }
+    .sheet-img-wrap {
+      width: 100%; aspect-ratio: 1; background: var(--card);
+      border-radius: 10px; overflow: hidden; margin-bottom: 1rem; position: relative;
+    }
+    .sheet-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+    .sheet-img-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:3rem; opacity:.15; }
+    .sheet-socials { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .social-btn {
+      display:inline-flex; align-items:center; gap:.3rem;
+      background:var(--card); border:1px solid var(--border); border-radius:6px;
+      color:var(--muted); font-size:.75rem; font-weight:600; font-family:var(--font-display);
+      letter-spacing:.04em; text-transform:uppercase; padding:.3rem .6rem;
+      text-decoration:none; transition:all .2s;
+    }
+    .social-btn:hover { border-color:var(--teal); color:var(--teal); }
+    .sheet-website-btn {
+      display:block; text-align:center; background:rgba(26,158,143,.1);
+      border:1px solid var(--teal); border-radius:8px; color:var(--teal);
+      font-size:.8rem; font-weight:600; font-family:var(--font-display);
+      letter-spacing:.05em; text-transform:uppercase; padding:.5rem;
+      text-decoration:none; margin-bottom:1rem; transition:all .2s;
+    }
+    .sheet-website-btn:hover { background:rgba(26,158,143,.2); }
+    .sheet-loading { display:flex; align-items:center; justify-content:center; padding:2rem; color:var(--muted); font-size:.85rem; gap:.5rem; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
     .sheet-actions {
       display: flex;
       gap: .75rem;
@@ -888,12 +914,13 @@ function refreshAll() {
 }
 
 // ── DETAIL SHEET ──
-function openSheet(id) {
-  const set = findSet(id);
-  if (!set) return;
-  activeSetId = id;
+// Cache des données artistes déjà chargées
+const artistCache = {};
+
+function renderSheetStatic(set) {
   const stageColor = STAGES[set.stage]?.color || '#1a9e8f';
   const sc = stageClass(set.stage);
+  const artistUrl = (typeof getArtistUrl === 'function') ? getArtistUrl(set.name) : null;
   document.getElementById('sheet-header').innerHTML = `
     <div class="sheet-stage-row">
       <span class="stage-dot ${sc}" style="width:9px;height:9px"></span>
@@ -904,10 +931,89 @@ function openSheet(id) {
     <div class="sheet-genre">${set.genre}</div>`;
   document.getElementById('sheet-body').innerHTML = `
     <div class="sheet-country">${set.country}</div>
-    <div class="sheet-desc">${set.desc}</div>`;
+    <div class="sheet-img-wrap"><div class="sheet-img-placeholder">🎸</div></div>
+    <div class="sheet-loading"><div class="spinner"></div> Chargement…</div>
+    ${artistUrl ? `<a class="sheet-website-btn" href="${artistUrl}" target="_blank" rel="noopener">🌐 Fiche officielle Motocultor</a>` : ''}`;
+}
+
+function renderSheetEnriched(set, data) {
+  const artistUrl = (typeof getArtistUrl === 'function') ? getArtistUrl(set.name) : null;
+  // Image
+  const imgWrap = document.querySelector('.sheet-img-wrap');
+  if (imgWrap && data.image) {
+    imgWrap.innerHTML = `<img src="${data.image}" alt="${set.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=sheet-img-placeholder>🎸</div>'">`;
+  }
+  // Remplacer le loading par desc + réseaux
+  const loading = document.querySelector('.sheet-loading');
+  if (loading) {
+    const socials = (data.socials || []).map(s => {
+      const icons = { facebook:'📘', instagram:'📷', youtube:'▶️', twitter:'🐦', spotify:'🎵', bandcamp:'🎵', website:'🌐' };
+      const icon = icons[s.type] || '🔗';
+      return `<a class="social-btn" href="${s.url}" target="_blank" rel="noopener">${icon} ${s.label}</a>`;
+    }).join('');
+    loading.outerHTML = `
+      <div class="sheet-desc">${data.desc || set.desc}</div>
+      ${socials ? `<div class="sheet-socials">${socials}</div>` : ''}`;
+  }
+}
+
+async function loadArtistData(set) {
+  const url = (typeof getArtistUrl === 'function') ? getArtistUrl(set.name) : null;
+  if (!url) return null;
+  if (artistCache[set.name]) return artistCache[set.name];
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // Image depuis og:image
+    const ogImg = doc.querySelector('meta[property="og:image"]')?.content;
+    // Description : premier paragraphe de contenu
+    const paras = doc.querySelectorAll('.elementor-widget-text-editor p, article p, .entry-content p');
+    let desc = '';
+    for (const p of paras) {
+      const t = p.textContent.trim();
+      if (t.length > 80) { desc = t; break; }
+    }
+    // Réseaux sociaux depuis les liens de la fiche
+    const socialLinks = [];
+    const socialPatterns = [
+      { re: /facebook\.com\/(?!MOTOCULTOR)/i,  type:'facebook',  label:'Facebook' },
+      { re: /instagram\.com\/(?!motocultorfestival)/i, type:'instagram', label:'Instagram' },
+      { re: /youtube\.com\/(?!user\/MotocultorFestProd)/i, type:'youtube', label:'YouTube' },
+      { re: /twitter\.com\/(?!MotocultorFest)/i, type:'twitter',  label:'Twitter' },
+      { re: /open\.spotify\.com/i,             type:'spotify',   label:'Spotify' },
+      { re: /bandcamp\.com/i,                   type:'bandcamp',  label:'Bandcamp' },
+    ];
+    doc.querySelectorAll('a[href]').forEach(a => {
+      const href = a.href;
+      for (const p of socialPatterns) {
+        if (p.re.test(href) && !socialLinks.find(s => s.url === href)) {
+          socialLinks.push({ type: p.type, label: p.label, url: href });
+          break;
+        }
+      }
+    });
+    const result = { image: ogImg || null, desc: desc || null, socials: socialLinks };
+    artistCache[set.name] = result;
+    return result;
+  } catch(e) {
+    return null;
+  }
+}
+
+function openSheet(id) {
+  const set = findSet(id);
+  if (!set) return;
+  activeSetId = id;
+  renderSheetStatic(set);
   updateSheetBtn();
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('detail-sheet').classList.add('open');
+  // Chargement asynchrone des données enrichies
+  loadArtistData(set).then(data => {
+    if (data && activeSetId === id) renderSheetEnriched(set, data);
+  });
 }
 function updateSheetBtn() {
   if (!activeSetId) return;
