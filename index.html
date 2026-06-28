@@ -731,6 +731,13 @@ function saveState() {
 }
 function isFav(id) { return favorites.includes(id); }
 
+// Fonction de calcul de poids universelle pour les tris temporels
+function getSortWeight(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const mins = h * 60 + m;
+  return h < 6 ? mins + (24 * 60) : mins;
+}
+
 function toggleFav(id) {
   const isCurrentlyFav = isFav(id);
   if (isCurrentlyFav) favorites = favorites.filter(f => f !== id);
@@ -789,9 +796,8 @@ function hasConflict(set) {
     const fParts = fid.split('-');
     if (sParts[0] !== fParts[0] || sParts[1] !== fParts[1]) return false;
     
-    const toMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
-    const ss = toMin(set.time), se = toMin(set.end);
-    const fs = toMin(f.time),   fe = toMin(f.end);
+    const ss = getSortWeight(set.time), se = getSortWeight(set.end);
+    const fs = getSortWeight(f.time),   fe = getSortWeight(f.end);
     return ss < fe && se > fs;
   });
 }
@@ -836,7 +842,7 @@ function renderSetCard(set) {
 function renderDay(day) {
   const sets = (LINE_UP[day] || [])
     .filter(s => currentStage === 'all' || s.stage === currentStage)
-    .sort((a,b) => a.time.localeCompare(b.time));
+    .sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
   const panel = document.getElementById(`panel-${day}`);
   if (!panel) return;
   if (!sets.length) {
@@ -856,7 +862,7 @@ function renderFavs() {
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
   let html = '';
   for (const [day, name] of Object.entries(labelsFull)) {
-    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a,b) => a.time.localeCompare(b.time));
+    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
     if (!sets.length) continue;
     html += `<div class="fav-day-title">${name}</div>` + sets.map(renderSetCard).join('');
   }
@@ -882,9 +888,7 @@ function refreshAll() {
   if (currentView === 'favs') renderFavs();
 }
 
-// ══════════════════════════════════
-//  DETAIL SHEET
-// ══════════════════════════════════
+// ── DETAIL SHEET ──
 function openSheet(id) {
   const set = findSet(id);
   if (!set) return;
@@ -1134,7 +1138,7 @@ function generateShareImage() {
   const W = 800, HEADER = 80, ROW = 52, PAD = 20, GAP = 8;
   const days = ['thursday','friday','saturday','sunday'];
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
-  const favsByDay = days.map(d => (LINE_UP[d] || []).filter(s => isFav(s.id)).sort((a,b)=>a.time.localeCompare(b.time)));
+  const favsByDay = days.map(d => (LINE_UP[d] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time)));
   const totalRows = favsByDay.reduce((sum, arr) => sum + (arr.length ? arr.length + 1 : 0), 0);
   const H = HEADER + totalRows * (ROW + GAP) + PAD * 2;
   canvas.width = W; canvas.height = Math.max(H, 200);
@@ -1208,7 +1212,7 @@ function copyPlanningText() {
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
   let text = `🤘 Mon planning Motocultor ${CURRENT_YEAR}\n\n`;
   days.forEach(day => {
-    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a,b)=>a.time.localeCompare(b.time));
+    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
     if (!sets.length) return;
     text += `📅 ${labelsFull[day]}\n`;
     sets.forEach(s => { text += `  ${s.time} — ${s.name} (${s.stage})\n`; });
@@ -1335,29 +1339,21 @@ document.getElementById('sheet-fav-btn').addEventListener('click', () => {
 
 // ── LOGIQUE D'INSTALLATION PWA ──
 window.addEventListener('beforeinstallprompt', e => {
-  // Empêche la barre d'installation native automatique sur Android/Chrome
   e.preventDefault();
-  // Stocke l'événement pour l'utiliser plus tard
   deferredPrompt = e;
-  // Affiche notre bouton d'installation personnalisé dans le header
   const installBtn = document.getElementById('pwa-install-btn');
   if (installBtn) installBtn.classList.add('show');
 });
 
 document.getElementById('pwa-install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
-  // Déclenche l'invite système d'installation
   deferredPrompt.prompt();
-  // Attend la réponse de l'utilisateur
   const { outcome } = await deferredPrompt.userChoice;
   console.log(`Résultat de la demande d'installation : ${outcome}`);
-  // L'événement ne peut être utilisé qu'une seule fois, on le nettoie
   deferredPrompt = null;
-  // Cache le bouton d'installation de l'interface
   document.getElementById('pwa-install-btn').classList.remove('show');
 });
 
-// Événement déclenché une fois l'application installée avec succès
 window.addEventListener('appinstalled', e => {
   console.log('Motocultor PWA installée avec succès !');
   deferredPrompt = null;
