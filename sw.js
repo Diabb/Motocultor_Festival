@@ -1,4 +1,4 @@
-const CACHE = 'motocultor-v6';
+const CACHE = 'motocultor-v7';
 const ASSETS = ['./index.html', './data.js', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
