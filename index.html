@@ -95,9 +95,8 @@
     .icon-btn:hover, .icon-btn.active { color: var(--teal); background: rgba(26,158,143,.1); }
     .icon-btn svg { width: 22px; height: 22px; }
 
-    /* Button installer spécifique */
     #pwa-install-btn {
-      display: none; /* Caché par défaut, affiché via JS si installable */
+      display: none; 
     }
     #pwa-install-btn.show {
       display: flex;
@@ -589,7 +588,6 @@
       </select>
     </div>
     <div class="header-actions">
-      <!-- Bouton d'installation PWA -->
       <button class="icon-btn" id="pwa-install-btn" title="Installer l'application">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -1282,12 +1280,18 @@ document.getElementById('year-select').addEventListener('change', e => {
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
+    // 1. On met à jour le jour actuel et l'onglet actif
     currentDay = tab.dataset.day;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel-${currentDay}`).classList.add('active');
-    if (currentView === 'grid') renderGrid();
+    
+    // 2. On affiche le bon contenu en fonction de la vue actuelle (corrige le bug Liste/Grille)
+    if (currentView === 'lineup') {
+      document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`panel-${currentDay}`).classList.add('active');
+    } else if (currentView === 'grid') {
+      renderGrid();
+    }
   });
 });
 
