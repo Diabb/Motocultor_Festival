@@ -1,4 +1,4 @@
-const CACHE = 'motocultor-v2';
+const CACHE = 'motocultor-v3';
 const ASSETS = ['./index.html'];
 
 self.addEventListener('install', e => {

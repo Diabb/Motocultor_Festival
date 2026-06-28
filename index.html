@@ -485,11 +485,72 @@
       .sheet.open { transform: translateX(-50%) translateY(0); }
       .sheet-overlay { backdrop-filter: blur(4px); }
     }
+
+    /* ── EN CE MOMENT ── */
+    .now-ticker { display:none; align-items:center; gap:.5rem; padding:.35rem 1rem; background:rgba(26,158,143,.12); border-bottom:1px solid rgba(26,158,143,.25); font-size:.78rem; color:var(--teal); font-weight:600; overflow:hidden; white-space:nowrap; }
+    .now-ticker.visible { display:flex; }
+    .now-pulse { width:7px; height:7px; border-radius:50%; background:var(--teal); flex-shrink:0; animation:pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+    .now-ticker-text { overflow:hidden; text-overflow:ellipsis; }
+    .set-card.is-now { background:rgba(26,158,143,.08); }
+    .set-card.is-now .set-time { color:var(--teal); }
+    .now-tag { font-size:.65rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--teal); border:1px solid var(--teal); border-radius:4px; padding:.1rem .35rem; animation:pulse 1.4s ease-in-out infinite; }
+
+    /* ── VUE GRILLE ── */
+    #grid-panel { display:none; overflow-x:auto; padding-bottom:5rem; }
+    #grid-panel.active { display:block; }
+    .grid-wrap { min-width:680px; padding:.75rem 0 .75rem 1rem; }
+    .grid-stages { display:grid; grid-template-columns:52px repeat(4,1fr); gap:2px; margin-bottom:4px; }
+    .grid-stage-label { font-family:var(--font-display); font-size:.65rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; text-align:center; padding:.4rem .2rem; border-radius:6px; }
+    .grid-timeline { position:relative; }
+    .grid-hour-label { position:absolute; left:0; width:48px; font-size:.6rem; color:var(--muted); font-family:var(--font-display); font-weight:600; text-align:right; padding-right:.4rem; transform:translateY(-50%); pointer-events:none; }
+    .grid-hour-rule { position:absolute; left:52px; right:1rem; height:1px; background:var(--border); opacity:.4; pointer-events:none; }
+    .grid-cols { display:grid; grid-template-columns:52px repeat(4,1fr); gap:2px; position:relative; }
+    .grid-stage-col { position:relative; }
+    .grid-set { position:absolute; left:2px; right:2px; border-radius:6px; padding:.25rem .35rem; cursor:pointer; overflow:hidden; transition:filter .15s; border-left:3px solid rgba(255,255,255,.15); }
+    .grid-set:hover { filter:brightness(1.25); }
+    .grid-set-name { font-family:var(--font-display); font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.02em; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .grid-set-time { font-size:.58rem; opacity:.65; margin-top:.1rem; }
+    .grid-set.is-fav { border-left-color:var(--teal) !important; }
+    .grid-set.is-now { outline:1.5px solid var(--teal); }
+    .grid-now-line { position:absolute; left:54px; right:1rem; height:2px; background:var(--teal); z-index:10; pointer-events:none; border-radius:1px; }
+    .grid-now-line::before { content:''; position:absolute; left:-5px; top:-3px; width:8px; height:8px; border-radius:50%; background:var(--teal); }
+
+    /* ── PARTAGER ── */
+    .share-sheet { position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-radius:20px 20px 0 0; z-index:201; transform:translateY(100%); transition:transform .3s cubic-bezier(.32,0,.67,0); padding:0 1rem 2rem; max-height:80dvh; overflow-y:auto; }
+    .share-sheet.open { transform:translateY(0); }
+    .share-title { font-family:var(--font-display); font-size:1.1rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:1rem 0 .5rem; }
+    .share-actions { display:flex; gap:.75rem; margin-top:.75rem; }
+    .btn-share { flex:1; border-radius:10px; font-family:var(--font-display); font-size:.9rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:.65rem; border:1.5px solid var(--border); background:var(--card); color:var(--cream); cursor:pointer; transition:all .2s; }
+    .btn-share:hover { border-color:var(--teal); color:var(--teal); }
+    canvas#share-canvas { display:none; }
+    .share-preview-img { width:100%; border-radius:10px; margin:.75rem 0; display:none; }
+
+    /* ── NOTIF BANNER ── */
+    #notif-banner { display:none; background:var(--surface); border-bottom:1px solid var(--border); padding:.6rem 1rem; align-items:center; gap:.75rem; font-size:.82rem; }
+    #notif-banner.show { display:flex; }
+    #notif-banner p { flex:1; color:var(--cream); }
+    #notif-allow { background:var(--teal); color:#fff; border:none; border-radius:6px; font-family:var(--font-display); font-size:.8rem; font-weight:600; padding:.35rem .75rem; cursor:pointer; white-space:nowrap; }
+    #notif-dismiss { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1.1rem; line-height:1; padding:.25rem; }
+
   </style>
 </head>
 <body>
 
 <div id="offline-banner">📵 Mode hors ligne — données en cache</div>
+
+<!-- NOTIF BANNER -->
+<div id="notif-banner">
+  <p>🔔 Activer les rappels 15 min avant tes favoris ?</p>
+  <button id="notif-allow">Activer</button>
+  <button id="notif-dismiss">✕</button>
+</div>
+
+<!-- TICKER EN CE MOMENT -->
+<div class="now-ticker" id="now-ticker">
+  <span class="now-pulse"></span>
+  <span class="now-ticker-text" id="now-ticker-text"></span>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -536,7 +597,24 @@
   <div class="day-panel" id="panel-sunday"></div>
   <div id="search-results" style="display:none"></div>
   <div id="fav-panel"></div>
+  <div id="grid-panel"></div>
 </main>
+
+<!-- SHARE SHEET -->
+<div class="sheet-overlay" id="share-overlay"></div>
+<div class="share-sheet" id="share-sheet">
+  <div class="sheet-handle"></div>
+  <div class="share-title">Mon planning Motocultor 2026</div>
+  <img class="share-preview-img" id="share-preview-img" alt="Aperçu">
+  <div class="share-actions">
+    <button class="btn-share" id="btn-generate-img">🖼 Générer l'image</button>
+    <button class="btn-share" id="btn-copy-text">📋 Copier le texte</button>
+  </div>
+  <div class="share-actions" style="margin-top:.5rem">
+    <button class="btn btn-close" id="share-close-btn" style="flex:1">Fermer</button>
+  </div>
+</div>
+<canvas id="share-canvas"></canvas>
 
 <!-- BOTTOM NAV -->
 <nav>
@@ -555,6 +633,20 @@
     </svg>
     Favoris
     <span class="fav-badge" id="fav-badge" style="display:none">0</span>
+  </button>
+  <button class="nav-btn" id="nav-grid" data-view="grid">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+    Grille
+  </button>
+  <button class="nav-btn" id="nav-share" data-view="share">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+    Partager
   </button>
 </nav>
 
@@ -889,25 +981,7 @@ function closeSheet() {
   activeSetId = null;
 }
 
-// ══════════════════════════════════
-//  VIEW SWITCHING
-// ══════════════════════════════════
-function switchView(view) {
-  currentView = view;
-  document.getElementById('nav-lineup').classList.toggle('active', view === 'lineup');
-  document.getElementById('nav-favs').classList.toggle('active', view === 'favs');
-  document.getElementById('day-tabs').style.display = view === 'lineup' ? 'flex' : 'none';
-  document.getElementById('stage-filter').style.display = view === 'lineup' ? 'flex' : 'none';
-  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('fav-panel').classList.remove('active');
-  document.getElementById('search-results').style.display = 'none';
-  if (view === 'lineup') {
-    document.getElementById(`panel-${currentDay}`).classList.add('active');
-  } else {
-    renderFavs();
-    document.getElementById('fav-panel').classList.add('active');
-  }
-}
+
 
 // ══════════════════════════════════
 //  EVENTS
@@ -971,6 +1045,367 @@ document.getElementById('sheet-fav-btn').addEventListener('click', () => {
 });
 
 // ══════════════════════════════════
+//  EN CE MOMENT
+// ══════════════════════════════════
+const DAY_DATES = { thursday:'2026-08-13', friday:'2026-08-14', saturday:'2026-08-15', sunday:'2026-08-16' };
+function toMinutes(t) {
+  const [h,m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function getNowMinutes() {
+  const now = new Date();
+  let mins = now.getHours() * 60 + now.getMinutes();
+  // sets après minuit : on traite les heures 0-4 comme 24-28
+  return mins;
+}
+function getTodayDay() {
+  const today = new Date().toISOString().slice(0,10);
+  return Object.entries(DAY_DATES).find(([,d]) => d === today)?.[0] || null;
+}
+function getSetsNow() {
+  const day = getTodayDay();
+  if (!day) return [];
+  const now = getNowMinutes();
+  return LINE_UP[day].filter(s => {
+    let start = toMinutes(s.time);
+    let end   = toMinutes(s.end);
+    if (end < start) end += 24*60; // après minuit
+    if (start > 20*60 && now < 6*60) { // on est après minuit, décaler now
+      return (now + 24*60) >= start && (now + 24*60) < end;
+    }
+    return now >= start && now < end;
+  });
+}
+function updateNow() {
+  const playing = getSetsNow();
+  // Ticker
+  const ticker  = document.getElementById('now-ticker');
+  const tickerTxt = document.getElementById('now-ticker-text');
+  if (playing.length) {
+    tickerTxt.textContent = '🎸 En ce moment : ' + playing.map(s => `${s.name} — ${s.stage}`).join(' · ');
+    ticker.classList.add('visible');
+  } else {
+    ticker.classList.remove('visible');
+  }
+  // Cards
+  document.querySelectorAll('.set-card').forEach(card => {
+    const id = card.dataset.id;
+    const isNow = playing.some(s => s.id === id);
+    card.classList.toggle('is-now', isNow);
+    const existing = card.querySelector('.now-tag');
+    if (isNow && !existing) {
+      const tag = document.createElement('span');
+      tag.className = 'now-tag';
+      tag.textContent = 'live';
+      card.querySelector('.set-meta')?.appendChild(tag);
+    } else if (!isNow && existing) {
+      existing.remove();
+    }
+  });
+}
+setInterval(updateNow, 30000);
+
+// ══════════════════════════════════
+//  RAPPELS NOTIFICATIONS
+// ══════════════════════════════════
+let notifTimers = [];
+function clearNotifTimers() {
+  notifTimers.forEach(t => clearTimeout(t));
+  notifTimers = [];
+}
+function scheduleReminders() {
+  clearNotifTimers();
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  favorites.forEach(fid => {
+    const set = findSet(fid);
+    if (!set) return;
+    const day = Object.entries(DAY_DATES).find(([k]) => fid.startsWith(k));
+    if (!day) return;
+    const [h,m] = set.time.split(':').map(Number);
+    const setDate = new Date(day[1] + 'T' + set.time + ':00');
+    const remindAt = new Date(setDate.getTime() - 15 * 60 * 1000);
+    const delay = remindAt - now;
+    if (delay > 0) {
+      const t = setTimeout(() => {
+        new Notification(`⚡ Dans 15 min : ${set.name}`, {
+          body: `${set.time} — ${set.stage}`,
+          icon: 'icon-192.png',
+          tag: fid
+        });
+      }, delay);
+      notifTimers.push(t);
+    }
+  });
+}
+function askNotifPermission() {
+  Notification.requestPermission().then(perm => {
+    document.getElementById('notif-banner').classList.remove('show');
+    if (perm === 'granted') scheduleReminders();
+  });
+}
+function initNotifBanner() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default' && favorites.length > 0) {
+    document.getElementById('notif-banner').classList.add('show');
+  }
+}
+document.getElementById('notif-allow').addEventListener('click', askNotifPermission);
+document.getElementById('notif-dismiss').addEventListener('click', () => {
+  document.getElementById('notif-banner').classList.remove('show');
+});
+
+// ══════════════════════════════════
+//  VUE GRILLE
+// ══════════════════════════════════
+const STAGE_ORDER = ['Dave Mustage','Supositor Stage','Massey Ferguscène','Bruce Dickinscène'];
+const PX_PER_MIN = 1.6; // 1.6px par minute
+const GRID_START = 11 * 60; // 11h
+const GRID_END   = 27 * 60; // 03h (lendemain)
+
+function renderGrid() {
+  const panel = document.getElementById('grid-panel');
+  const day = currentDay;
+  const sets = LINE_UP[day] || [];
+  const totalMins = GRID_END - GRID_START;
+  const totalH = totalMins * PX_PER_MIN;
+
+  // Stage colors
+  const colors = {
+    'Dave Mustage':      { bg:'rgba(249,115,22,.18)', border:'#f97316' },
+    'Supositor Stage':   { bg:'rgba(26,158,143,.18)', border:'#1a9e8f' },
+    'Massey Ferguscène': { bg:'rgba(124,77,255,.18)', border:'#7c4dff' },
+    'Bruce Dickinscène': { bg:'rgba(34,197,94,.18)',  border:'#22c55e' },
+  };
+
+  // Build hour labels & rules
+  let hoursHTML = '';
+  let rulesHTML = '';
+  for (let h = 11; h <= 27; h++) {
+    const label = h < 24 ? `${h}h` : `${h-24}h`;
+    const top = (h * 60 - GRID_START) * PX_PER_MIN;
+    hoursHTML += `<div class="grid-hour-label" style="top:${top}px">${label}</div>`;
+    rulesHTML += `<div class="grid-hour-rule" style="top:${top}px"></div>`;
+  }
+
+  // Build stage columns
+  let colsHTML = '<div style="position:relative;width:52px;height:'+totalH+'px"></div>';
+  STAGE_ORDER.forEach(stage => {
+    const stageSets = sets.filter(s => s.stage === stage);
+    let setsHTML = '';
+    stageSets.forEach(s => {
+      let startMin = toMinutes(s.time);
+      let endMin   = toMinutes(s.end);
+      if (endMin < startMin) endMin += 24*60;
+      // normalize to grid
+      if (startMin < GRID_START) startMin += 24*60;
+      if (endMin < GRID_START)   endMin   += 24*60;
+      const top  = (startMin - GRID_START) * PX_PER_MIN;
+      const h    = (endMin - startMin) * PX_PER_MIN;
+      const fav  = isFav(s.id);
+      const isNow = getSetsNow().some(n => n.id === s.id);
+      const c = colors[stage] || { bg:'rgba(100,100,100,.2)', border:'#666' };
+      setsHTML += `<div class="grid-set${fav?' is-fav':''}${isNow?' is-now':''}" data-id="${s.id}"
+        style="top:${top}px;height:${h}px;background:${c.bg};border-left-color:${c.border}">
+        <div class="grid-set-name">${s.name}</div>
+        <div class="grid-set-time">${s.time}</div>
+      </div>`;
+    });
+    colsHTML += `<div class="grid-stage-col" style="position:relative;height:${totalH}px">${setsHTML}</div>`;
+  });
+
+  // Current time line
+  const nowDay = getTodayDay();
+  let nowLineHTML = '';
+  if (nowDay === day) {
+    let nowMin = getNowMinutes();
+    if (nowMin < GRID_START - 12*60) nowMin += 24*60; // après minuit
+    if (nowMin >= GRID_START && nowMin <= GRID_END) {
+      const top = (nowMin - GRID_START) * PX_PER_MIN;
+      nowLineHTML = `<div class="grid-now-line" style="top:${top}px"></div>`;
+    }
+  }
+
+  // Stage headers
+  let headersHTML = '<div></div>';
+  STAGE_ORDER.forEach(stage => {
+    const c = colors[stage] || {};
+    headersHTML += `<div class="grid-stage-label" style="background:${c.bg||'rgba(100,100,100,.1)'};color:${c.border||'#fff'}">${stage}</div>`;
+  });
+
+  panel.innerHTML = `<div class="grid-wrap">
+    <div class="grid-stages">${headersHTML}</div>
+    <div style="position:relative">
+      ${hoursHTML}
+      ${rulesHTML}
+      ${nowLineHTML}
+      <div class="grid-cols">${colsHTML}</div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════
+//  PARTAGER MON PLANNING
+// ══════════════════════════════════
+function openShareSheet() {
+  document.getElementById('share-overlay').classList.add('open');
+  document.getElementById('share-sheet').classList.add('open');
+  document.getElementById('share-preview-img').style.display = 'none';
+}
+function closeShareSheet() {
+  document.getElementById('share-overlay').classList.remove('open');
+  document.getElementById('share-sheet').classList.remove('open');
+}
+function generateShareImage() {
+  const canvas = document.getElementById('share-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 800, HEADER = 80, ROW = 52, PAD = 20, GAP = 8;
+  const days = ['thursday','friday','saturday','sunday'];
+  const dayNames = { thursday:'Jeudi 13', friday:'Vendredi 14', saturday:'Samedi 15', sunday:'Dimanche 16' };
+  const favsByDay = days.map(d => LINE_UP[d].filter(s => isFav(s.id)).sort((a,b)=>a.time.localeCompare(b.time)));
+  const totalRows = favsByDay.reduce((sum, arr) => sum + (arr.length ? arr.length + 1 : 0), 0);
+  const H = HEADER + totalRows * (ROW + GAP) + PAD * 2;
+  canvas.width = W; canvas.height = Math.max(H, 200);
+
+  // BG
+  ctx.fillStyle = '#0f0f0f';
+  ctx.fillRect(0, 0, W, canvas.height);
+
+  // Header
+  ctx.fillStyle = '#1a9e8f';
+  ctx.fillRect(0, 0, W, HEADER);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 28px Oswald, sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MOTOCULTOR 2026', PAD, HEADER/2 - 6);
+  ctx.font = '14px Inter, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.fillText('Mon planning · diabb.github.io/Motocultor_Festival', PAD, HEADER/2 + 14);
+
+  const stageColors = {
+    'Dave Mustage':'#f97316','Supositor Stage':'#1a9e8f',
+    'Massey Ferguscène':'#7c4dff','Bruce Dickinscène':'#22c55e'
+  };
+
+  let y = HEADER + PAD;
+  days.forEach((day, di) => {
+    const sets = favsByDay[di];
+    if (!sets.length) return;
+    // Day label
+    ctx.fillStyle = '#333';
+    ctx.fillRect(PAD, y, W - PAD*2, 28);
+    ctx.fillStyle = '#888';
+    ctx.font = 'bold 12px Oswald, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(dayNames[day].toUpperCase(), PAD + 10, y + 14);
+    y += 28 + GAP;
+
+    sets.forEach(s => {
+      const sc = stageColors[s.stage] || '#888';
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(PAD, y, W - PAD*2, ROW);
+      // accent bar
+      ctx.fillStyle = sc;
+      ctx.fillRect(PAD, y, 4, ROW);
+      // time
+      ctx.fillStyle = sc;
+      ctx.font = 'bold 14px Oswald, sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.time, PAD + 14, y + ROW/2 - 7);
+      // name
+      ctx.fillStyle = '#e8e4dc';
+      ctx.font = 'bold 16px Oswald, sans-serif';
+      ctx.fillText(s.name.toUpperCase(), PAD + 14, y + ROW/2 + 8);
+      // stage
+      ctx.fillStyle = sc;
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(s.stage, W - PAD - 8, y + ROW/2);
+      ctx.textAlign = 'left';
+      y += ROW + GAP;
+    });
+  });
+
+  if (totalRows === 0) {
+    ctx.fillStyle = '#888';
+    ctx.font = '16px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Ajoute des favoris pour générer ton planning !', W/2, canvas.height/2);
+  }
+
+  const img = document.getElementById('share-preview-img');
+  img.src = canvas.toDataURL('image/png');
+  img.style.display = 'block';
+}
+function copyPlanningText() {
+  const days = ['thursday','friday','saturday','sunday'];
+  const dayNames = { thursday:'Jeudi 13/08', friday:'Vendredi 14/08', saturday:'Samedi 15/08', sunday:'Dimanche 16/08' };
+  let text = '🤘 Mon planning Motocultor 2026
+
+';
+  days.forEach(day => {
+    const sets = LINE_UP[day].filter(s => isFav(s.id)).sort((a,b)=>a.time.localeCompare(b.time));
+    if (!sets.length) return;
+    text += `📅 ${dayNames[day]}
+`;
+    sets.forEach(s => { text += `  ${s.time} — ${s.name} (${s.stage})
+`; });
+    text += '
+';
+  });
+  text += 'diabb.github.io/Motocultor_Festival';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy-text');
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => { btn.textContent = '📋 Copier le texte'; }, 2000);
+  });
+}
+
+document.getElementById('share-overlay').addEventListener('click', closeShareSheet);
+document.getElementById('share-close-btn').addEventListener('click', closeShareSheet);
+document.getElementById('btn-generate-img').addEventListener('click', () => {
+  generateShareImage();
+  const img = document.getElementById('share-preview-img');
+  // propose téléchargement
+  const a = document.createElement('a');
+  a.href = img.src;
+  a.download = 'motocultor-2026-planning.png';
+  a.click();
+});
+document.getElementById('btn-copy-text').addEventListener('click', copyPlanningText);
+
+// ══════════════════════════════════
+//  VIEW SWITCHING (mise à jour)
+// ══════════════════════════════════
+function switchView(view) {
+  currentView = view;
+  ['lineup','favs','grid'].forEach(v => {
+    document.getElementById('nav-'+v)?.classList.toggle('active', v === view);
+  });
+  document.getElementById('day-tabs').style.display = (view === 'lineup' || view === 'grid') ? 'flex' : 'none';
+  document.getElementById('stage-filter').style.display = view === 'lineup' ? 'flex' : 'none';
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('fav-panel').classList.remove('active');
+  document.getElementById('grid-panel').classList.remove('active');
+  document.getElementById('search-results').style.display = 'none';
+  if (view === 'lineup') {
+    document.getElementById(`panel-${currentDay}`).classList.add('active');
+  } else if (view === 'favs') {
+    renderFavs();
+    document.getElementById('fav-panel').classList.add('active');
+  } else if (view === 'grid') {
+    renderGrid();
+    document.getElementById('grid-panel').classList.add('active');
+  } else if (view === 'share') {
+    // stay on current view, just open sheet
+    if (currentView !== 'share') currentView = 'lineup';
+    openShareSheet();
+    return;
+  }
+}
+
+// ══════════════════════════════════
 //  OFFLINE
 // ══════════════════════════════════
 window.addEventListener('offline', () => document.getElementById('offline-banner').classList.add('show'));
@@ -982,6 +1417,8 @@ window.addEventListener('online',  () => document.getElementById('offline-banner
 (function init() {
   Object.keys(LINE_UP).forEach(renderDay);
   updateBadge();
+  updateNow();
+  initNotifBanner();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
