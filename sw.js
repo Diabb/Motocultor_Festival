@@ -1,4 +1,4 @@
-const CACHE = 'motocultor-v4';
+const CACHE = 'motocultor-v5';
 const ASSETS = ['./index.html', './data.js'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Les requêtes POST ou d'extensions de navigateurs sont exclues pour éviter les blocages hors ligne
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).then(res => {
       const clone = res.clone();
