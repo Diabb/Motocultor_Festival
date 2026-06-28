@@ -1,5 +1,5 @@
-const CACHE = 'motocultor-v3';
-const ASSETS = ['./index.html'];
+const CACHE = 'motocultor-v4';
+const ASSETS = ['./index.html', './data.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
