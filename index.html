@@ -711,7 +711,7 @@ let currentStage = 'all';
 let currentView = 'lineup';
 let searchActive = false;
 let activeSetId = null;
-let deferredPrompt = null; // Stocke l'événement d'installation PWA
+let deferredPrompt = null; 
 
 const dayLabels = {
   '2026': { thursday:'Jeu 13', friday:'Ven 14', saturday:'Sam 15', sunday:'Dim 16' },
@@ -731,7 +731,7 @@ function saveState() {
 }
 function isFav(id) { return favorites.includes(id); }
 
-// Fonction de calcul de poids universelle pour les tris temporels
+// Fonction de calcul de poids universelle pour les tris temporels (corrige les heures après minuit)
 function getSortWeight(timeStr) {
   const [h, m] = timeStr.split(':').map(Number);
   const mins = h * 60 + m;
@@ -796,6 +796,7 @@ function hasConflict(set) {
     const fParts = fid.split('-');
     if (sParts[0] !== fParts[0] || sParts[1] !== fParts[1]) return false;
     
+    // On utilise notre helper de poids pour éviter les conflits erronés autour de minuit
     const ss = getSortWeight(set.time), se = getSortWeight(set.end);
     const fs = getSortWeight(f.time),   fe = getSortWeight(f.end);
     return ss < fe && se > fs;
@@ -842,7 +843,7 @@ function renderSetCard(set) {
 function renderDay(day) {
   const sets = (LINE_UP[day] || [])
     .filter(s => currentStage === 'all' || s.stage === currentStage)
-    .sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
+    .sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time)); // Tri corrigé pour la nuit
   const panel = document.getElementById(`panel-${day}`);
   if (!panel) return;
   if (!sets.length) {
@@ -862,7 +863,7 @@ function renderFavs() {
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
   let html = '';
   for (const [day, name] of Object.entries(labelsFull)) {
-    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
+    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time)); // Tri corrigé pour la nuit
     if (!sets.length) continue;
     html += `<div class="fav-day-title">${name}</div>` + sets.map(renderSetCard).join('');
   }
@@ -1083,10 +1084,11 @@ function renderGrid() {
       const fav  = isFav(s.id);
       const isNow = getSetsNow().some(n => n.id === s.id);
       const c = colors[stage] || { bg:'rgba(100,100,100,.2)', border:'#666' };
+      // Ajout de s.end pour afficher l'heure de fin sur la grille
       setsHTML += `<div class="grid-set${fav?' is-fav':''}${isNow?' is-now':''}" data-id="${s.id}"
         style="top:${top}px;height:${h}px;background:${c.bg};border-left-color:${c.border}">
         <div class="grid-set-name">${s.name}</div>
-        <div class="grid-set-time">${s.time}</div>
+        <div class="grid-set-time">${s.time} - ${s.end}</div>
       </div>`;
     });
     colsHTML += `<div class="grid-stage-col" style="position:relative;height:${totalH}px">${setsHTML}</div>`;
@@ -1138,7 +1140,7 @@ function generateShareImage() {
   const W = 800, HEADER = 80, ROW = 52, PAD = 20, GAP = 8;
   const days = ['thursday','friday','saturday','sunday'];
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
-  const favsByDay = days.map(d => (LINE_UP[d] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time)));
+  const favsByDay = days.map(d => (LINE_UP[d] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time))); // Tri corrigé
   const totalRows = favsByDay.reduce((sum, arr) => sum + (arr.length ? arr.length + 1 : 0), 0);
   const H = HEADER + totalRows * (ROW + GAP) + PAD * 2;
   canvas.width = W; canvas.height = Math.max(H, 200);
@@ -1212,7 +1214,7 @@ function copyPlanningText() {
   const labelsFull = dayNamesFull[CURRENT_YEAR] || dayNamesFull['2026'];
   let text = `🤘 Mon planning Motocultor ${CURRENT_YEAR}\n\n`;
   days.forEach(day => {
-    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time));
+    const sets = (LINE_UP[day] || []).filter(s => isFav(s.id)).sort((a, b) => getSortWeight(a.time) - getSortWeight(b.time)); // Tri corrigé
     if (!sets.length) return;
     text += `📅 ${labelsFull[day]}\n`;
     sets.forEach(s => { text += `  ${s.time} — ${s.name} (${s.stage})\n`; });
@@ -1324,9 +1326,14 @@ document.getElementById('search-input').addEventListener('input', e => {
 
 document.addEventListener('click', e => {
   const card = e.target.closest('.set-card');
+  const gridSet = e.target.closest('.grid-set'); // Permet l'ouverture de la fiche depuis la grille
   const favBtn = e.target.closest('.fav-btn');
+  
   if (favBtn) { e.stopPropagation(); toggleFav(favBtn.dataset.id); return; }
+  
+  // Ouvre la fiche de détail
   if (card) openSheet(card.dataset.id);
+  if (gridSet) openSheet(gridSet.dataset.id);
 });
 
 document.getElementById('sheet-overlay').addEventListener('click', closeSheet);
