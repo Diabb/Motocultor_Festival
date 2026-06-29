@@ -148,7 +148,7 @@ header {
   background: var(--teal);
 }
 
-/* ── STAGE FILTER ── */
+/* ── STAGE FILTER (FUTURE-PROOF) ── */
 .stage-filter {
   display: flex;
   gap: .5rem;
@@ -177,10 +177,10 @@ header {
   color: var(--teal);
   background: rgba(26,158,143,.1);
 }
-.stage-chip[data-stage="Dave Mustage"].active     { border-color: #f97316; color: #f97316; background: rgba(249,115,22,.1); }
-.stage-chip[data-stage="Supositor Stage"].active  { border-color: var(--teal); color: var(--teal); background: rgba(26,158,143,.1); }
-.stage-chip[data-stage="Massey Ferguscène"].active { border-color: #7c4dff; color: #7c4dff; background: rgba(124,77,255,.1); }
-.stage-chip[data-stage="Bruce Dickinscène"].active { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,.1); }
+.stage-chip[data-stage="Dave Mustage"].active     { border-color: var(--color-keltia); color: var(--color-keltia); background: rgba(249,115,22,.1); }
+.stage-chip[data-stage="Supositor Stage"].active  { border-color: var(--color-dolmen); color: var(--color-dolmen); background: rgba(26,158,143,.1); }
+.stage-chip[data-stage="Massey Ferguscène"].active { border-color: var(--color-menhir); color: var(--color-menhir); background: rgba(124,77,255,.1); }
+.stage-chip[data-stage="Bruce Dickinscène"].active { border-color: var(--color-souterrain); color: var(--color-souterrain); background: rgba(34,197,94,.1); }
 
 /* ── MAIN ── */
 main { flex: 1; padding: .5rem 0 5rem; }
@@ -266,12 +266,12 @@ main { flex: 1; padding: .5rem 0 5rem; }
 .fav-btn.active { color: var(--teal); }
 .fav-btn svg { width: 20px; height: 20px; }
 
-/* ── STAGE COLORS ── */
-.stage-dot.keltia     { background: #f97316; }   
-.stage-dot.dolmen     { background: #1a9e8f; }   
-.stage-dot.menhir     { background: #7c4dff; }   
-.stage-dot.souterrain { background: #22c55e; }   
-.stage-dot.main       { background: var(--teal); }
+/* ── STAGE COLORS (FUTURE-PROOF) ── */
+.stage-dot.keltia     { background: var(--color-keltia, #f97316); }   
+.stage-dot.dolmen     { background: var(--color-dolmen, #1a9e8f); }   
+.stage-dot.menhir     { background: var(--color-menhir, #7c4dff); }   
+.stage-dot.souterrain { background: var(--color-souterrain, #22c55e); }   
+.stage-dot.main       { background: var(--color-main, var(--teal)); }
 
 /* ── EMPTY STATE ── */
 .empty {

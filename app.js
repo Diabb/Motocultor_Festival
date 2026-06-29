@@ -72,6 +72,24 @@ function autoSelectDay() {
   }
 }
 
+// Génère dynamiquement les variables de couleur pour le CSS (FUTURE-PROOF)
+function injectStageStyles() {
+  let styleTag = document.getElementById('dynamic-stage-styles');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'dynamic-stage-styles';
+    document.head.appendChild(styleTag);
+  }
+
+  let cssVariables = ':root {\n';
+  Object.entries(STAGES).forEach(([stageName, stageInfo]) => {
+    cssVariables += `  --color-${stageInfo.cls}: ${stageInfo.color};\n`;
+  });
+  cssVariables += '}';
+
+  styleTag.textContent = cssVariables;
+}
+
 // ════════════════════════════════════════════════════
 //  MOTEUR DE RENDU (RENDER ENGINE)
 // ════════════════════════════════════════════════════
@@ -153,10 +171,12 @@ function renderGrid(day) {
   
   let html = `<div class="grid-wrap">`;
   
+  // Rendu des en-têtes de colonnes (Scènes)
   html += `<div class="grid-stages"><div class="grid-stage-label">Heures</div>`;
   stagesList.forEach(stg => {
     const cls = STAGES[stg]?.cls || 'main';
-    html += `<div class="grid-stage-label ${cls}" style="border: 1px solid var(--border); background: var(--surface);">${stg.replace(' Stage', '').replace('cène', '.')}</div>`;
+    // Modif future-proof : Utilisation de la variable CSS injectée dynamiquement
+    html += `<div class="grid-stage-label ${cls}" style="border: 1px solid var(--border); border-top: 3px solid var(--color-${cls}); background: var(--surface); color: var(--color-${cls});">${stg.replace(' Stage', '').replace('cène', '.')}</div>`;
   });
   html += `</div>`;
   
@@ -224,7 +244,7 @@ function switchView(view) {
     document.getElementById('day-tabs').style.display = 'flex';
     document.getElementById('stage-filter').style.display = 'flex';
     
-    // CORRECTIF : Assure le calcul et le rendu visuel du jour actuel d'entrée de jeu
+    // Assure le calcul et le rendu visuel du jour actuel d'entrée de jeu
     renderDay(currentDay);
     
     if (!document.getElementById('search-wrap').classList.contains('hidden') && document.getElementById('search-input').value) {
@@ -479,6 +499,9 @@ function setupEventListeners() {
         LINE_UP = YEAR_DATA.lineup;
         DAY_DATES = YEAR_DATA.dates;
         
+        // On ré-injecte les nouveaux styles de l'année choisie
+        injectStageStyles();
+        
         currentStage = 'all';
         document.querySelectorAll('.stage-chip').forEach(c => c.classList.remove('active'));
         document.querySelector('.stage-chip[data-stage="all"]')?.classList.add('active');
@@ -532,28 +555,31 @@ function setupEventListeners() {
 //  INITIALISATION DE L'APPLICATION
 // ════════════════════════════════════════════════════
 function init() {
-  // 1. Initialiser tous les écouteurs d'événements
+  // 1. Injecter les couleurs du festival en cours dans le CSS avant de lancer le rendu
+  injectStageStyles();
+
+  // 2. Initialiser tous les écouteurs d'événements
   setupEventListeners();
   
-  // 2. Définir le jour actuel par défaut et mettre à jour le compteur de favoris
+  // 3. Définir le jour actuel par défaut et mettre à jour le compteur de favoris
   autoSelectDay();
   updateBadge();
   
-  // 3. Activer visuellement l'onglet correspondant au bon jour
+  // 4. Activer visuellement l'onglet correspondant au bon jour
   document.querySelectorAll('.tab').forEach(t => {
     t.classList.toggle('active', t.getAttribute('data-day') === currentDay);
   });
   
-  // 4. Générer le HTML de départ pour l'ensemble de la programmation
+  // 5. Générer le HTML de départ pour l'ensemble de la programmation
   Object.keys(LINE_UP).forEach(renderDay);
   
-  // 5. Lancer et afficher la vue principale avec le rendu forcé
+  // 6. Lancer et afficher la vue principale avec le rendu forcé
   switchView('lineup');
 }
 
-// CORRECTIF CRITIQUE : Lancement à toute épreuve (évite le blocage lié aux PWA / Cache-only)
+// Lancement à toute épreuve (évite le blocage lié aux PWA / Cache-only)
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
-  init(); // Si le DOM est déjà prêt en tâche de fond, on force l'initialisation immédiate
+  init(); 
 }
