@@ -548,7 +548,10 @@ function init() {
     t.classList.toggle('active', t.getAttribute('data-day') === currentDay);
   });
   
-  // 4. Lancer la vue principale pour afficher les données HTML
+  // 4. Générer le HTML de tous les concerts pour chaque jour (LE CORRECTIF EST ICI)
+  Object.keys(LINE_UP).forEach(renderDay);
+  
+  // 5. Lancer la vue principale pour afficher les données HTML
   switchView('lineup');
 }
 
