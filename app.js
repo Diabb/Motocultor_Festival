@@ -40,6 +40,7 @@ function getSortWeight(timeStr) {
   return h < 6 ? mins + (24 * 60) : mins; // Gestion des concerts après minuit
 }
 
+// Met à jour la pastille rouge des favoris dans le menu du bas
 function updateBadge() {
   const badge = document.getElementById('fav-badge');
   if (badge) {
@@ -145,14 +146,13 @@ function renderGrid(day) {
   if (!gridPanel) return;
   
   const stagesList = ["Dave Mustage", "Supositor Stage", "Massey Ferguscène", "Bruce Dickinscène"];
-  const startHour = 11; // 11h00 du matin
-  const endHour = 27;   // 03h00 du matin (24 + 3)
-  const rowHeight = 60; // 60px par heure (soit 1px par minute)
+  const startHour = 11; 
+  const endHour = 27;   
+  const rowHeight = 60; 
   const totalHeight = (endHour - startHour) * rowHeight;
   
   let html = `<div class="grid-wrap">`;
   
-  // Rendu des en-têtes de colonnes (Scènes)
   html += `<div class="grid-stages"><div class="grid-stage-label">Heures</div>`;
   stagesList.forEach(stg => {
     const cls = STAGES[stg]?.cls || 'main';
@@ -162,7 +162,6 @@ function renderGrid(day) {
   
   html += `<div class="grid-timeline" style="height: ${totalHeight}px;">`;
   
-  // Tracé des lignes repères horaires
   for (let h = startHour; h <= endHour; h++) {
     const displayHour = h >= 24 ? h - 24 : h;
     const topPos = (h - startHour) * rowHeight;
@@ -171,7 +170,6 @@ function renderGrid(day) {
       <div class="grid-hour-rule" style="top: ${topPos}px;"></div>`;
   }
   
-  // Rendu des colonnes de concerts
   html += `<div class="grid-cols" style="height: ${totalHeight}px;"><div></div>`;
   
   stagesList.forEach(stg => {
@@ -226,6 +224,9 @@ function switchView(view) {
     document.getElementById('day-tabs').style.display = 'flex';
     document.getElementById('stage-filter').style.display = 'flex';
     
+    // CORRECTIF : Assure le calcul et le rendu visuel du jour actuel d'entrée de jeu
+    renderDay(currentDay);
+    
     if (!document.getElementById('search-wrap').classList.contains('hidden') && document.getElementById('search-input').value) {
       document.getElementById('search-results').style.display = 'block';
     } else {
@@ -246,7 +247,6 @@ function switchView(view) {
   } else if (view === 'share') {
     document.getElementById('share-sheet').classList.add('open');
     document.getElementById('share-overlay').classList.add('open');
-    // Conserver la vue précédente active sous la modale
     currentView = 'lineup';
     switchView('lineup');
   }
@@ -262,7 +262,6 @@ function toggleFavorite(id) {
   saveState();
   updateBadge();
   
-  // Synchroniser l'état visuel en temps réel sur l'écran courant
   if (currentView === 'lineup') {
     Object.keys(LINE_UP).forEach(renderDay);
     if (document.getElementById('search-input').value) {
@@ -275,7 +274,6 @@ function toggleFavorite(id) {
   }
 }
 
-// Gestion de la fiche modale descriptive (Detail Sheet)
 function openDetail(id) {
   const set = findSet(id);
   if (!set) return;
@@ -453,7 +451,7 @@ function setupEventListeners() {
     }
   });
 
-  // Gestion unifiée des clics sur les cartes (Délégation d'événements)
+  // Gestion unifiée des clics sur les cartes
   document.getElementById('main-content').addEventListener('click', (e) => {
     const favBtn = e.target.closest('.fav-btn');
     if (favBtn) {
@@ -517,11 +515,9 @@ function setupEventListeners() {
   document.getElementById('sheet-close-btn').addEventListener('click', closeDetail);
   document.getElementById('sheet-overlay').addEventListener('click', closeDetail);
   document.getElementById('sheet-fav-btn').addEventListener('click', (e) => {
-    // Récupération de l'ID via le bouton cliqué
     const id = e.target.getAttribute('data-id');
     toggleFavorite(id);
     
-    // Mise à jour visuelle du bouton dans la modale
     if (isFav(id)) {
       e.target.classList.add('active');
       e.target.textContent = '★ Retirer des favoris';
@@ -548,12 +544,16 @@ function init() {
     t.classList.toggle('active', t.getAttribute('data-day') === currentDay);
   });
   
-  // 4. Générer le HTML de tous les concerts pour chaque jour (LE CORRECTIF EST ICI)
+  // 4. Générer le HTML de départ pour l'ensemble de la programmation
   Object.keys(LINE_UP).forEach(renderDay);
   
-  // 5. Lancer la vue principale pour afficher les données HTML
+  // 5. Lancer et afficher la vue principale avec le rendu forcé
   switchView('lineup');
 }
 
-// Déclencher l'initialisation uniquement quand la page est totalement chargée
-document.addEventListener('DOMContentLoaded', init);
+// CORRECTIF CRITIQUE : Lancement à toute épreuve (évite le blocage lié aux PWA / Cache-only)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init(); // Si le DOM est déjà prêt en tâche de fond, on force l'initialisation immédiate
+}
