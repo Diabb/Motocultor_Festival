@@ -68,7 +68,7 @@ const FESTIVAL_DATA = {
         { id:'2026-fri-26', name:'Hrafngrimr',                   time:'17:25', end:'18:10', stage:'Bruce Dickinscène', genre:'Black Metal',        country:'🇫🇷 France',    desc:'Black metal atmosphérique français aux influences nordiques. Hrafngrimr tisse une toile de riffs gelés et d\'atmosphères hivernales.' },
         { id:'2026-fri-27', name:'Miracle of Sound',             time:'19:10', end:'20:00', stage:'Bruce Dickinscène', genre:'Rock/Metal',         country:'🇮🇪 Irlande',   desc:'Gavin Dunne alias Miracle of Sound — compositeur célèbre des réseaux pour ses tributs musicaux aux jeux vidéo — s\'essaie à la scène.' },
         { id:'2026-fri-28', name:'VDouble o A',                  time:'21:00', end:'22:00', stage:'Bruce Dickinscène', genre:'Symphonic Metal',    country:'🇦🇹 Autriche',  desc:'Metal symphonique maritime et épique d\'Autriche. Visions of Atlantis emmènent vers des horizons nautiques avec deux chanteurs et une orchestration somptueuse.' },
-        { id:'2026-fri-29', name:'Master Boot Record',           time:'23:00', end:'00:10', stroke:'Bruce Dickinscène', genre:'Chiptune/Metal',     country:'🇮🇹 Italie',    desc:'Projet unique mélangeant chiptune 8-bit et metal. Master Boot Record transforme des sons de Game Boy en symphonies métalliques absurdes et brillantes.' },
+        { id:'2026-fri-29', name:'Master Boot Record',           time:'23:00', end:'00:10', stage:'Bruce Dickinscène', genre:'Chiptune/Metal',     country:'🇮🇹 Italie',    desc:'Projet unique mélangeant chiptune 8-bit et metal. Master Boot Record transforme des sons de Game Boy en symphonies métalliques absurdes et brillantes.' },
         { id:'2026-fri-30', name:'Eihwar',                       time:'01:20', end:'02:20', stage:'Bruce Dickinscène', genre:'Folk/Black',         country:'🇫🇷 France',    desc:'Black metal folk normand aux thèmes nordiques et aux accents celtiques. Eihwar forgent un metal du terroir profondément ancré.' }
       ],
       saturday: [
@@ -80,7 +80,7 @@ const FESTIVAL_DATA = {
         { id:'2026-sat-06', name:'Eisbrecher',           time:'21:00', end:'22:00', stage:'Dave Mustage',      genre:'Industrial Metal',  country:'🇩🇪 Allemagne', desc:'Industrial metal allemand entre Rammstein et Die Krupps. Eisbrecher font danser les headbangers avec leurs synthés massifs et leurs riffs lourds.' },
         { id:'2026-sat-07', name:'Within Temptation',    time:'23:00', end:'00:10', stage:'Dave Mustage',      genre:'Symphonic Metal',   country:'🇳🇱 Pays-Bas',  desc:'Géants du metal symphonique néerlandais. Sharon den Adel et Within Temptation offrent une production scénique grandiose et des hymnes universels.' },
         { id:'2026-sat-08', name:'Perturbator',          time:'01:30', end:'02:30', stage:'Dave Mustage',      genre:'Synthwave/Metal',   country:'🇫🇷 France',    desc:'James Kent alias Perturbator fusionne synthwave rétro-futuriste et metal industriel dans des sets nocturnes hypnotiques et fascinants.' },
-        { id:'2026-sat-09', name:'Aorlhac',              time:'13:30', end:'14:10', stage:'Supositor Stage',   genre:'Black Metal',       country:'🇫🇷 France',    desc:'Black metal atmosphérique français aux textes occitans et à l\'identité régionale affirmée. Aorlhac portent leur terroir dans leur musique.' },
+        { id:'2026-sat-09', name:'Aorlhac',              time:'13:30', end:'14:10', stage:'Supositor Stage',   genre:'Black Metal',       country:'🇫🇷 France',    desc:'Black metal atmosphérique français aux textes occitans et à l\'identité régionale affirmeé. Aorlhac portent leur terroir dans leur musique.' },
         { id:'2026-sat-10', name:'Rectal Smegma',        time:'15:00', end:'15:40', stage:'Supositor Stage',   genre:'Noise/Grind',       country:'🇳🇱 Pays-Bas',  desc:'Noise grind néerlandais dans la grande tradition underground. Rectal Smegma incarnent l\'extrême pour l\'extrême, sans filtre ni explication.' },
         { id:'2026-sat-11', name:'Cancer',               time:'16:35', end:'17:20', stage:'Supositor Stage',   genre:'Death Metal',       country:'🇬🇧 UK',        desc:'Death metal britannique des origines depuis Worcester. Cancer reviennent avec leur son old-school massif et leur franchise musicale intacte.' },
         { id:'2026-sat-12', name:'Grave',                time:'18:15', end:'19:05', stage:'Supositor Stage',   genre:'Death Metal',       country:'🇸🇪 Suède',     desc:'Légendes du death metal suédois de Stockholm. Grave n\'ont jamais changé leur formule depuis 1986 et c\'est exactement ce qu\'on leur demande.' },
@@ -92,7 +92,7 @@ const FESTIVAL_DATA = {
         { id:'2026-sat-18', name:'Hollow Jan',           time:'16:35', end:'17:20', stage:'Massey Ferguscène', genre:'Metal/Electro',     country:'🇫🇷 France',    desc:'Projet metal électronique français entre industriel et ambiant. Hollow Jan construit des mondes sonores intrigants et enveloppants.' },
         { id:'2026-sat-19', name:'Múr',                  time:'18:15', end:'19:05', stage:'Massey Ferguscène', genre:'Sludge/Post-Metal', country:'🇫🇷 France',    desc:'Sludge et post-metal français aux compositions lentes et massives. Múr imposent leur lourdeur avec patience et conviction.' },
         { id:'2026-sat-20', name:'Slift',                time:'20:05', end:'20:55', stage:'Massey Ferguscène', genre:'Psych/Stoner',      country:'🇫🇷 France',    desc:'Space rock et stoner psychédélique toulousain d\'une puissance cosmique. Slift sont l\'un des groupes les plus excitants de la scène rock française actuelle.' },
-        { id:'2026-sat-21', name:'Svinkels Friends & Fam',time:'22:15',end:'23:05', stage:'Massey Ferguscène', genre:'Hip-Hop/Metal', color:'🇫🇷 France',   desc:'Le collectif hip-hop punk français Svinkels et ses invités — une fête chaotique et survoltée à mi-chemin entre rap et punk rock.' },
+        { id:'2026-sat-21', name:'Svinkels Friends & Fam',time:'22:15',end:'23:05', stage:'Massey Ferguscène', genre:'Hip-Hop/Metal', country:'🇫🇷 France',   desc:'Le collectif hip-hop punk français Svinkels et ses invités — une fête chaotique et survoltée à mi-chemin entre rap et punk rock.' },
         { id:'2026-sat-22', name:'Sierra Veins',         time:'00:25', end:'01:25', stage:'Massey Ferguscène', genre:'Post-Metal',        country:'🇬🇧 UK',        desc:'Post-metal atmosphérique britannique aux textures sombres and aux compositions longues. Sierra Veins créent des paysages musicaux enveloppants.' },
         { id:'2026-sat-23', name:'Shady Fat Katz',       time:'12:45', end:'13:25', stage:'Bruce Dickinscène', genre:'Groove/Stoner',     country:'🇺🇸 USA',       desc:'Groove stoner américain aux influences hip-hop et metal. Shady Fat Katz balancent un son groovy et détendu qui fait bouger tout le monde.' },
         { id:'2026-sat-24', name:'Monde de Merde',       time:'14:15', end:'14:55', stage:'Bruce Dickinscène', genre:'Hardcore/Punk',     country:'🇫🇷 France',    desc:'Hardcore punk français direct et engagé. Monde de Merde décrit le monde avec la rage et la franchise d\'un groupe qui n\'en peut plus.' },
@@ -105,8 +105,8 @@ const FESTIVAL_DATA = {
       ],
       sunday: [
         { id:'2026-sun-01', name:'Holy Mother',          time:'11:45', end:'12:25', stage:'Dave Mustage',      genre:'Heavy Metal',        country:'🇺🇸 USA',       desc:'Heavy metal américain traditionnel aux hymnes puissants. Holy Mother cultivent un son classique et intemporel avec conviction.' },
-        { id:'2026-sun-02', name:'Jools',                time:'13:05', end:'13:45', stage:'Dave Mustage',      genre:'Metal/Alt',          country:'🇫🇷 France',    desc:'Artiste metal alternatif français à la personnalité affirmée. Jools apporte sa vision singulière du metal avec une énergie scénique communicative.' },
-        { id:'sun-03', name:'Killers',              time:'14:30', end:'15:10', stage:'Dave Mustage',      genre:'Heavy Metal',        country:'🇫🇷 France',    desc:'Institution du heavy metal français fondée par des membres d\'Iron Maiden. Killers portent depuis 40 ans un metal puissant et sincère.' },
+        { id:'2026-sun-02', name:'Jools',                time:'13:05', end:'13:45', stage:'Dave Mustage',      genre:'Metal/Alt',          country:'🇫🇷 France',    desc:'Artiste metal alternatif français à la personnalité affirmee. Jools apporte sa vision singulière du metal avec une énergie scénique communicative.' },
+        { id:'2026-sun-03', name:'Killers',              time:'14:30', end:'15:10', stage:'Dave Mustage',      genre:'Heavy Metal',        country:'🇫🇷 France',    desc:'Institution du heavy metal français fondée par des membres d\'Iron Maiden. Killers portent depuis 40 ans un metal puissant et sincère.' },
         { id:'2026-sun-04', name:'Fit for an Autopsy',   time:'16:05', end:'16:50', stage:'Dave Mustage',      genre:'Deathcore',          country:'🇺🇸 USA',       desc:'Deathcore américain de haute qualité avec une touche technique et atmosphérique. Fit for an Autopsy sont devenus un acteur majeur du metal extrême moderne.' },
         { id:'2026-sun-05', name:'Kim Dracula',          time:'17:50', end:'18:40', stage:'Dave Mustage',      genre:'Alt/Nu-Metal',       country:'🇦🇺 Australie', desc:'Artiste alt-metal et nu-metal australien au style visuel extravagant. Kim Dracula mélange esthétique glam horror et metal percutant.' },
         { id:'2026-sun-06', name:'Airbourne',            time:'19:40', end:'20:40', stage:'Dave Mustage',      genre:'Hard Rock',          country:'🇦🇺 Australie', desc:'Hard rock australien survitaminé. Airbourne sont les héritiers spirituels d\'AC/DC, avec autant d\'énergie brute et de riffs entraînants.' },
@@ -160,150 +160,3 @@ const FESTIVAL_DATA = {
     }
   }
 };
-
-// Variables d'accès globales initialisées dynamiquement par l'application
-let CURRENT_YEAR = localStorage.getItem('moto_year') || "2026";
-let YEAR_DATA    = FESTIVAL_DATA[CURRENT_YEAR] || FESTIVAL_DATA["2026"];
-let STAGES       = YEAR_DATA.stages;
-let LINE_UP      = YEAR_DATA.lineup;
-let DAY_DATES    = YEAR_DATA.dates;
-
-function setGlobalYear(year) {
-  if (!FESTIVAL_DATA[year]) return;
-  CURRENT_YEAR = year;
-  localStorage.setItem('moto_year', year);
-  YEAR_DATA = FESTIVAL_DATA[year];
-  STAGES    = YEAR_DATA.stages;
-  LINE_UP   = YEAR_DATA.lineup;
-  DAY_DATES = YEAR_DATA.dates;
-}
-
-// ════════════════════════════════════════════════════
-//  SLUGS ARTISTES — motocultor-festival.com/artiste/{slug}/
-// ════════════════════════════════════════════════════
-const ARTIST_SLUGS = {
-  "Unearth":                      "unearth",
-  "Kittie":                       "kittie",
-  "Godsmack":                     "godsmack",
-  "Primus":                       "primus",
-  "200 Stab Wounds":              "200-stab-wounds",
-  "Sanguisugabogg":               "sanguisugabogg",
-  "Bloodbath":                    "bloodbath",
-  "Death Angel":                  "death-angel",
-  "Municipal Waste":              "municipal-waste",
-  "Battlesnake":                  "battlesnake",
-  "Pilori":                       "pilori",
-  "Gaerea":                       "gaerea",
-  "Amenra":                       "amenra",
-  "Oomph!":                       "oomph",
-  "Fauxx":                        "fauxx",
-  "Brieg Guerveno":               "brieg-guerveno",
-  "Celkilt x Bagad de Quimper":   "celkilt-x-bagad-de-quimper",
-  "Denez Prigent":                "denez-prigent",
-  "Komodrag and the Mounodor":    "komodrag-and-the-mounodor",
-  "Ice Sealed Eyes":              "ice-sealed-eyes",
-  "Cage Fight":                   "cage-fight",
-  "Hellripper":                   "hellripper",
-  "Revnoir":                      "revnoir",
-  "Lord of the Lost":             "lord-of-the-lost",
-  "Mass Hysteria":                "mass-hysteria",
-  "Slaughter to Prevail":         "slaughter-to-prevail",
-  "Filth":                        "filth",
-  "Guineapig":                    "guineapig",
-  "Skaphos":                      "skaphos",
-  "Bölzer":                       "bolzer",
-  "Coroner":                      "coroner",
-  "Unleashed":                    "unleashed",
-  "Emperor":                      "emperor",
-  "Darkened Nocturn Slaughtercult":"darkened-nocturn-slaughtercult",
-  "Gravity":                      "gravity",
-  "Urne":                         "urne",
-  "Iotunn":                       "iotunn",
-  "Textures":                     "textures",
-  "Soen":                         "soen",
-  "Paradise Lost":                "paradise-lost",
-  "Alcest":                       "alcest",
-  "Nawather":                     "nawather",
-  "Vansind":                      "vansind",
-  "Stille Volk":                  "stille-volk",
-  "Hrafngrimr":                   "hrafngrimr",
-  "Miracle of Sound":             "miracle-of-sound",
-  "Visions of Atlantis":          "visions-of-atlantis",
-  "Master Boot Record":           "master-boot-record",
-  "Eihwar":                       "eihwar",
-  "Necrowretch":                  "necrowretch",
-  "Ashen":                        "ashen",
-  "Ill Niño":                     "ill-nino",
-  "Orden Ogan":                   "orden-ogan",
-  "Leprous":                      "leprous",
-  "Eisbrecher":                   "eisbrecher",
-  "Within Temptation":            "within-temptation",
-  "Perturbator":                  "perturbator",
-  "Aorlhac":                      "aorlhac",
-  "Rectal Smegma":                "rectal-smegma",
-  "Cancer":                       "cancer",
-  "Grave":                        "grave",
-  "Anaal Nathrakh":               "anaal-nathrakh",
-  "Nevermore":                    "nevermore",
-  "Omnium Gatherum":              "omnium-gatherum",
-  "Basalt":                       "basalt",
-  "Bruit≤":                       "bruit",
-  "Hollow Jan":                   "hollow-jan",
-  "Múr":                          "mur",
-  "Slift":                        "slift",
-  "Svinkels Friends & Family":    "svinkels-friends-family",
-  "Sierra Veins":                 "sierra-veins",
-  "Shady Fat Katz":               "shady-fat-katz",
-  "Monde de Merde":               "monde-de-merde",
-  "Jetsex":                       "jetsex",
-  "The Casualties":               "the-casualties",
-  "Les 3 Fromages":               "les-3-fromages",
-  "Frog Leap":                    "frog-leap",
-  "Steven'n'Seagulls":          "stevenndseagulls",
-  "Nanowar of Steel":             "nanowar-of-steel",
-  "Holy Mother":                  "holy-mother",
-  "Jools":                        "jools",
-  "Killers":                      "killers",
-  "Fit for an Autopsy":           "fit-for-an-autopsy",
-  "Kim Dracula":                  "kim-dracula",
-  "Airbourne":                    "airbourne",
-  "Judas Priest":                 "judas-priest",
-  "Arch Enemy":                   "arch-enemy",
-  "Internal Bleeding":            "internal-bleeding",
-  "Heavy/Hitter":                 "heavy-hitter",
-  "Cryptopsy":                    "cryptopsy",
-  "Signs of the Swarm":           "signs-of-the-swarm",
-  "Witch Club Satan":             "witch-club-satan",
-  "Vader":                        "vader",
-  "Sacred Reich":                 "sacred-reich",
-  "Eyes":                         "eyes",
-  "Heretoir":                     "heretoir",
-  "Pain Magazine":                "pain-magazine",
-  "John Cxnnor":                  "john-cxnnor",
-  "Voivod":                       "voivod",
-  "Deafheaven":                   "deafheaven",
-  "Shaârghot":                    "shaarghot",
-  "Les Hommes Crabes":            "les-hommes-crabes",
-  "Modder":                       "modder",
-  "Red Sun Atacama":              "red-sun-atacama",
-  "Wormsand":                     "wormsand",
-  "Castle Rat":                   "castle-rat",
-  "Monkeys on Mars":              "monkeys-on-mars",
-  "Coltaine":                     "coltaine",
-  "Warning":                      "warning",
-};
-
-function getArtistUrl(name) {
-  const slug = ARTIST_SLUGS[name];
-  if (!slug) return null;
-  return \`https://www.motocultor-festival.com/artiste/\${slug}/\`;
-}
-
-// Image officielle : og:image pattern = /wp-content/uploads/{year}/{month}/{NAME_YEAR}.webp
-// On construit une URL via un proxy image ou on charge dynamiquement depuis la fiche
-function getArtistImageUrl(name) {
-  const slug = ARTIST_SLUGS[name];
-  if (!slug) return null;
-  // L'image est dans la balise og:image de chaque fiche — on la charge dynamiquement
-  return \`https://www.motocultor-festival.com/artiste/\${slug}/\`;
-}
