@@ -497,8 +497,60 @@ function setupEventListeners() {
     });
   }
 
+  // Écouteurs pour la navigation basse (Menu principal)
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const view = e.target.closest('.nav-btn').getAttribute('data-view');
+      if (view) switchView(view);
+    });
+  });
+
+  // Boutons de Partage
+  document.getElementById('btn-copy-text')?.addEventListener('click', copyShareText);
+  document.getElementById('btn-generate-img')?.addEventListener('click', generateShareImage);
+  document.getElementById('share-close-btn')?.addEventListener('click', () => {
+    document.getElementById('share-sheet').classList.remove('open');
+    document.getElementById('share-overlay').classList.remove('open');
+  });
+
   // Fermetures des Modales & Événements Internes
   document.getElementById('sheet-close-btn').addEventListener('click', closeDetail);
   document.getElementById('sheet-overlay').addEventListener('click', closeDetail);
   document.getElementById('sheet-fav-btn').addEventListener('click', (e) => {
-    const id = e.target.
+    // Récupération de l'ID via le bouton cliqué
+    const id = e.target.getAttribute('data-id');
+    toggleFavorite(id);
+    
+    // Mise à jour visuelle du bouton dans la modale
+    if (isFav(id)) {
+      e.target.classList.add('active');
+      e.target.textContent = '★ Retirer des favoris';
+    } else {
+      e.target.classList.remove('active');
+      e.target.textContent = '☆ Ajouter aux favoris';
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════
+//  INITIALISATION DE L'APPLICATION
+// ════════════════════════════════════════════════════
+function init() {
+  // 1. Initialiser tous les écouteurs d'événements
+  setupEventListeners();
+  
+  // 2. Définir le jour actuel par défaut et mettre à jour le compteur de favoris
+  autoSelectDay();
+  updateBadge();
+  
+  // 3. Activer visuellement l'onglet correspondant au bon jour
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('data-day') === currentDay);
+  });
+  
+  // 4. Lancer la vue principale pour afficher les données HTML
+  switchView('lineup');
+}
+
+// Déclencher l'initialisation uniquement quand la page est totalement chargée
+document.addEventListener('DOMContentLoaded', init);
